@@ -2,81 +2,87 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { envConfig } from "../config/env";
 import { unauthorized } from "../middleware/session";
-import { OAuth2Client } from "google-auth-library";
+import { google } from "googleapis";
 import { db } from "../db";
 import { user } from "../db/schema";
 import { eq } from "drizzle-orm";
 
-const client = new OAuth2Client(envConfig.GOOGLE_CLIENT_ID);
+const oauth2Client = new google.auth.OAuth2(
+  envConfig.GOOGLE_CLIENT_ID,
+  envConfig.GOOGLE_CLIENT_SECRET,
+  `${envConfig.API_URL}/auth/google/callback`
+);
 
-export const googleSignIn = async (req: Request, res: Response) => {
-  const idToken = req.headers.authorization?.split(" ")[1];
-  if (!idToken) return res.status(401).json({ message: "No token provided" });
-
+export const googleCallback = async (req: Request, res: Response) => {
   try {
-    // verify token with Google
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: envConfig.GOOGLE_CLIENT_ID,
-    });
+    const code = req.query.code as string;
+    if (!code) return res.status(400).send("No code provided");
 
-    const payload = ticket.getPayload();
-    if (!payload) throw new Error("Invalid token");
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
 
-    // payload contains email, name, sub (Google ID)
-    const userEmail = payload.email;
-    const userId = payload.sub;
-    const userName = payload.name;
+    const oauth2 = google.oauth2({ version: "v2", auth: oauth2Client });
+    const { data: userInfo } = await oauth2.userinfo.get();
 
-    if (!userEmail) throw new Error("No email in Google payload");
+    if (!userInfo.email || !userInfo.id) {
+      return res.status(400).json({
+        message: "Invalid Google user data",
+        data: null,
+        success: false,
+      });
+    }
 
+    // Check if user exists
     const existing = await db
       .select()
       .from(user)
-      .where(eq(user.email, userEmail))
+      .where(eq(user.email, userInfo.email))
       .limit(1);
 
     if (existing.length === 0) {
-      // user exists hehe, so create em
+      // create user
       await db.insert(user).values({
-        name: userName!,
-        email: userEmail!,
-        id: userId,
+        id: userInfo.id,
+        email: userInfo.email,
+        name: userInfo.name || "Unknown",
         authMethod: "google",
       });
     }
 
+    // Generate your app JWTs
     const accessToken = jwt.sign(
-      { id: userId, email: userEmail },
+      { id: userInfo.id, email: userInfo.email },
       envConfig.JWT_SECRET,
       { expiresIn: "15m" }
     );
 
     const refreshToken = jwt.sign(
-      { id: userId, email: userEmail },
+      { id: userInfo.id, email: userInfo.email },
       envConfig.REFRESH_SECRET,
       { expiresIn: "7d" }
     );
 
-    res.json({
-      data: {
-        accessToken,
-        refreshToken,
-        user: {
-          email: userEmail,
-          id: userId,
-        },
-      },
-      success: true,
-      message: "Signed in with Google successfully",
-    });
+    // Redirect back to app with tokens (or set cookie)
+    const redirectUrl = `myapp://auth?accessToken=${accessToken}&refreshToken=${refreshToken}`;
+    res.redirect(redirectUrl);
   } catch (err) {
-    if (err instanceof Error) {
-      res
-        .status(500)
-        .json({ message: "Internal Server Error", error: err.message });
-    }
+    console.error(err);
+    res.status(500).json({
+      message: "Google login failed",
+      error: err,
+      success: false,
+      data: null,
+    });
   }
+};
+
+export const googleSignIn = (req: Request, res: Response) => {
+  const url = oauth2Client.generateAuthUrl({
+    access_type: "offline",
+    scope: ["profile", "email"],
+  });
+
+  res.redirect(url);
 };
 
 export const refresh = (req: Request, res: Response) => {

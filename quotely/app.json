@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "quotely",
+    "scheme": "quotely",
     "slug": "quotely",
     "version": "1.0.0",
     "orientation": "portrait",
