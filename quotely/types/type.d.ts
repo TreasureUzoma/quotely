@@ -7,3 +7,15 @@ type CustomButtonProps = {
   textStyle?: TextStyle;
   disabled?: boolean;
 };
+
+type Note = {
+  id: string;
+  content: string;
+  date: string;
+  bgColor: string;
+};
+
+type HeaderProps = {
+  title: string;
+  elements?: React.ReactNode;
+};

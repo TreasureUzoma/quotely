@@ -6,18 +6,7 @@ export const authStyles = StyleSheet.create({
     padding: 20,
     justifyContent: "space-between",
     backgroundColor: "#fff",
-  },
-  top: {
-    marginTop: 40,
-    alignItems: "center",
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  bottom: {
-    marginBottom: 40,
+    gap: 30,
   },
   heading: {
     fontSize: 32,
@@ -27,6 +16,7 @@ export const authStyles = StyleSheet.create({
       ios: "Geist_700Bold",
     }),
     marginBottom: 15,
+    letterSpacing: -1.2,
   },
   subText: {
     fontSize: 17,
@@ -35,7 +25,7 @@ export const authStyles = StyleSheet.create({
       android: "Geist_400Regular",
       ios: "Geist_400Regular",
     }),
-    color: "#555",
+    color: "#1C2121",
   },
   button: {
     paddingVertical: 16,

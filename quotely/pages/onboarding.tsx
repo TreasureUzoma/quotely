@@ -1,16 +1,8 @@
 import React, { useRef, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  FlatList,
-  Image,
-} from "react-native";
+import { View, Text, FlatList, Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CustomButton } from "../components/ui/button";
-
-const { width, height } = Dimensions.get("window");
+import { onboardingStyles as styles, width } from "../styles/onbarding";
 
 const slides = [
   {
@@ -21,7 +13,7 @@ const slides = [
   },
   {
     id: "2",
-    title: "Organize your thougt",
+    title: "Organize your thougts",
     text: "Most beautiful note taking application.",
     image: require("../assets/images/onboarding/clip-chatting-with-girlfriend 1.png"),
   },
@@ -57,20 +49,17 @@ export const OnboardingPage = ({ navigation }: any) => {
 
   return (
     <View style={styles.root}>
-      {/* Slider */}
       <FlatList
         ref={flatListRef}
         data={slides}
         renderItem={({ item }) => (
           <View style={styles.slide}>
-            {/* Image Top */}
             <Image
               source={item.image}
               style={styles.image}
               resizeMode="contain"
             />
 
-            {/* Text Center */}
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.text}>{item.text}</Text>
           </View>
@@ -83,7 +72,6 @@ export const OnboardingPage = ({ navigation }: any) => {
         keyExtractor={(item) => item.id}
       />
 
-      {/* Progress Bar */}
       <View style={styles.progressBar}>
         {slides.map((_, index) => (
           <View
@@ -96,7 +84,6 @@ export const OnboardingPage = ({ navigation }: any) => {
         ))}
       </View>
 
-      {/* Button Bottom */}
       <CustomButton
         title={currentIndex === slides.length - 1 ? "Get Started" : "Next"}
         onPress={handleNext}
@@ -105,52 +92,3 @@ export const OnboardingPage = ({ navigation }: any) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 40,
-    backgroundColor: "#fff",
-  },
-  slide: {
-    width,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  image: {
-    width: width * 0.7,
-    height: height * 0.35,
-    marginBottom: 30,
-  },
-  title: {
-    fontSize: 24,
-    fontFamily: "Geist_700Bold",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  text: {
-    fontSize: 16,
-    textAlign: "center",
-    fontFamily: "Geist_400Regular",
-    color: "#555",
-  },
-  progressBar: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginVertical: 20,
-  },
-  progressDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#ddd",
-    marginHorizontal: 5,
-  },
-  activeDot: {
-    backgroundColor: "#007AFF",
-    width: 20,
-  },
-});

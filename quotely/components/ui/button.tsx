@@ -1,6 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Text, View } from "react-native";
-import { buttonStyles as styles } from "../../pages/button";
+import { buttonStyles as styles } from "../../styles/button";
 
 export const CustomButton = ({
   title,

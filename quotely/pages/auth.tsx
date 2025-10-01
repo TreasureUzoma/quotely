@@ -10,7 +10,8 @@ export const AuthPage = () => {
 
   return (
     <View style={styles.root}>
-      <View style={styles.top}>
+      <Text style={{ opacity: 0 }}>.</Text>
+      <View>
         <Text style={styles.heading}>Welcome to Quotely</Text>
         <Text style={styles.subText}>
           Sign in below to use Quotely. We'll create your account if you don't
@@ -18,16 +19,11 @@ export const AuthPage = () => {
         </Text>
       </View>
 
-      <View style={styles.center}>
-        <Ionicons name="document-text-outline" size={120} color="#4F46E5" />
-      </View>
-
-      <View style={styles.bottom}>
+      <View>
         <CustomButton
           title="Continue with Google"
           iconLeft={<Ionicons name="logo-google" size={20} color="white" />}
-          onPress={() => navigation.navigate("Home")}
-          style={styles.button}
+          onPress={() => navigation.replace("Main")}
         />
       </View>
     </View>
