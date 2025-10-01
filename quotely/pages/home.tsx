@@ -9,9 +9,9 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
+  TextInput,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 
 import { dummyNotes } from "../data/notes";
@@ -23,7 +23,6 @@ interface HeaderProps {
   selectedCount?: number;
   onPressCancel?: () => void;
   onPressDelete?: () => void;
-  onPressSearch?: () => void;
 }
 
 const Header = ({
@@ -32,7 +31,6 @@ const Header = ({
   selectedCount,
   onPressCancel,
   onPressDelete,
-  onPressSearch,
 }: HeaderProps) => {
   return (
     <View style={styles.headerContainer}>
@@ -41,7 +39,6 @@ const Header = ({
         backgroundColor="transparent"
         barStyle={isSelectionMode ? "light-content" : "dark-content"}
       />
-
       <View
         style={[styles.header, isSelectionMode && { backgroundColor: "#ddd" }]}
       >
@@ -64,7 +61,7 @@ const Header = ({
         </View>
 
         <View style={styles.headerRight}>
-          {isSelectionMode && onPressDelete ? (
+          {isSelectionMode && onPressDelete && (
             <TouchableOpacity
               onPress={onPressDelete}
               style={styles.headerButton}
@@ -78,15 +75,6 @@ const Header = ({
                 }
               />
             </TouchableOpacity>
-          ) : (
-            onPressSearch && (
-              <TouchableOpacity
-                onPress={onPressSearch}
-                style={styles.headerButton}
-              >
-                <Ionicons name="search" size={20} color="#1C2121" />
-              </TouchableOpacity>
-            )
           )}
         </View>
       </View>
@@ -95,9 +83,9 @@ const Header = ({
 };
 
 export const HomePage = () => {
-  const navigation = useNavigation<NavigationProp<any>>();
   const [notes, setNotes] = useState<Note[]>(dummyNotes);
   const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const isSelectionMode = selectedNoteIds.length > 0;
 
@@ -131,6 +119,17 @@ export const HomePage = () => {
     setSelectedNoteIds([]);
   };
 
+  const handleSearchChange = (text: string) => {
+    setSearchQuery(text);
+    console.log("Searching for:", text);
+  };
+
+  const filteredNotes = searchQuery
+    ? notes.filter((note) =>
+        note.content.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : notes;
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <Header
@@ -139,15 +138,30 @@ export const HomePage = () => {
         selectedCount={selectedNoteIds.length}
         onPressCancel={handleCancel}
         onPressDelete={handleDelete}
-        onPressSearch={() => navigation.navigate("SearchPage")}
       />
+
+      {/* Always visible search bar */}
+      <View style={styles.searchContainer}>
+        <Ionicons
+          name="search"
+          size={20}
+          color="#999"
+          style={{ marginRight: 8 }}
+        />
+        <TextInput
+          placeholder="Search notes..."
+          value={searchQuery}
+          onChangeText={handleSearchChange}
+          style={styles.searchInput}
+        />
+      </View>
 
       <View style={styles.contentRoot}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {notes.length === 0 ? (
+          {filteredNotes.length === 0 ? (
             <NoNotes />
           ) : (
-            notes.map((note, idx) => {
+            filteredNotes.map((note, idx) => {
               const isSelected = selectedNoteIds.includes(note.id!);
               return (
                 <TouchableOpacity
@@ -204,6 +218,17 @@ const styles = StyleSheet.create({
     }),
   },
   headerButton: { marginRight: 10, fontWeight: "bold" },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 20,
+    marginVertical: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: "#f0f0f0",
+  },
+  searchInput: { flex: 1, fontSize: 16 },
   contentRoot: { flex: 1, paddingHorizontal: 20 },
   scrollContent: { paddingTop: 10, paddingBottom: 40 },
   noteCard: {
