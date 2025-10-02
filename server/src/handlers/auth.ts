@@ -20,17 +20,13 @@ const oauth2Client = new google.auth.OAuth2(
 export const googleCallback = async (req: Request, res: Response) => {
   try {
     const code = req.query.code as string;
-    const redirectUri = req.query.redirect_uri as string;
+    const clientRedirect = decodeURIComponent(req.query.state as string);
 
     if (!code) return res.status(400).send("No code provided");
 
     const { tokens } = await oauth2Client.getToken({
       code,
-      redirect_uri: `${
-        envConfig.PROD_URL
-      }/api/v1/auth/google/callback?redirect_uri=${encodeURIComponent(
-        redirectUri
-      )}`,
+      redirect_uri: `${envConfig.PROD_URL}/api/v1/auth/google/callback`,
     });
     oauth2Client.setCredentials(tokens);
 
@@ -79,8 +75,7 @@ export const googleCallback = async (req: Request, res: Response) => {
     );
 
     // Redirect back to app with tokens
-    const finalRedirect = `${redirectUri}?accessToken=${accessToken}&refreshToken=${refreshToken}`;
-    console.log(finalRedirect);
+    const finalRedirect = `${clientRedirect}?accessToken=${accessToken}&refreshToken=${refreshToken}`;
     res.redirect(finalRedirect);
   } catch (err) {
     console.error(err);
@@ -94,9 +89,12 @@ export const googleCallback = async (req: Request, res: Response) => {
 };
 
 export const googleSignIn = (req: Request, res: Response) => {
+  const clientRedirect = req.query.redirect_uri as string;
   const url = oauth2Client.generateAuthUrl({
     access_type: "offline",
     scope: ["profile", "email"],
+    redirect_uri: `${envConfig.PROD_URL}/api/v1/auth/google/callback`,
+    state: encodeURIComponent(clientRedirect),
   });
 
   res.redirect(url);
