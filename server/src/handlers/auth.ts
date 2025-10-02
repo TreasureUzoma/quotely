@@ -14,7 +14,7 @@ if (!envConfig.PROD_URL) {
 const oauth2Client = new google.auth.OAuth2(
   envConfig.GOOGLE_CLIENT_ID,
   envConfig.GOOGLE_CLIENT_SECRET,
-  `${envConfig.PROD_URL}/auth/google/callback`
+  `${envConfig.PROD_URL}/api/v1/auth/google/callback`
 );
 
 export const googleCallback = async (req: Request, res: Response) => {
