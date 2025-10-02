@@ -10,6 +10,7 @@ import { apiUrl } from "../constants";
 import { setTokens } from "../lib/auth/token-storage";
 import Toast from "react-native-toast-message";
 import { useGoogleAuth } from "../hooks/use-auth";
+import { AppLogo } from "../components/app-logo";
 
 export const AuthPage = () => {
   const navigation = useNavigation<any>();

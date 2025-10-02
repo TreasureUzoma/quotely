@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import {
-  StyleSheet,
   View,
   TouchableOpacity,
   Text,
-  Platform,
-  ScrollView,
   SafeAreaView,
   StatusBar,
   TextInput,
@@ -13,6 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
+import { HomeStyles as styles } from "../styles/home";
 
 import { NoNotes } from "../components/no-notes";
 import { useNotes } from "../hooks/use-notes";
@@ -83,6 +81,14 @@ const Header = ({
     </View>
   );
 };
+
+const SkeletonNote = () => (
+  <View style={[styles.noteCard, { backgroundColor: "#eee" }]}>
+    <View
+      style={{ flex: 1, height: 20, backgroundColor: "#ddd", borderRadius: 4 }}
+    />
+  </View>
+);
 
 export const HomePage = () => {
   const { remove } = useNotes();
@@ -170,97 +176,42 @@ export const HomePage = () => {
       </View>
 
       <View style={styles.contentRoot}>
-        <FlatList
-          data={filteredNotes}
-          keyExtractor={(item) => item.id!}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onLongPress={() => handleLongPress(item.id!)}
-              onPress={() =>
-                isSelectionMode
-                  ? handleSelectNote(item.id!)
-                  : console.log("Navigate")
-              }
-              style={[styles.noteCard, { backgroundColor: item.bgColor }]}
-            >
-              <Text style={styles.content}>{item.content}</Text>
-            </TouchableOpacity>
-          )}
-          onEndReached={() => {
-            if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-          }}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={() =>
-            isFetchingNextPage ? <ActivityIndicator /> : null
-          }
-        />
+        {isLoading ? (
+          <View style={{ paddingTop: 10 }}>
+            {Array.from({ length: 7 }).map((_, index) => (
+              <SkeletonNote key={index} />
+            ))}
+          </View>
+        ) : filteredNotes.length === 0 ? (
+          <NoNotes />
+        ) : (
+          <FlatList
+            data={filteredNotes}
+            keyExtractor={(item) => item.id!}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onLongPress={() => handleLongPress(item.id!)}
+                onPress={() =>
+                  isSelectionMode
+                    ? handleSelectNote(item.id!)
+                    : console.log("Navigate")
+                }
+                style={[styles.noteCard, { backgroundColor: item.bgColor }]}
+              >
+                <Text style={styles.content}>{item.content}</Text>
+              </TouchableOpacity>
+            )}
+            onEndReached={() => {
+              if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+            }}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={() =>
+              isFetchingNextPage ? <ActivityIndicator /> : null
+            }
+          />
+        )}
       </View>
       <Toast />
     </SafeAreaView>
   );
 };
-
-const SkeletonNote = () => (
-  <View style={[styles.noteCard, { backgroundColor: "#eee" }]}>
-    <View
-      style={{ flex: 1, height: 20, backgroundColor: "#ddd", borderRadius: 4 }}
-    />
-  </View>
-);
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#fff" },
-  headerContainer: { backgroundColor: "transparent" },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 10,
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-  },
-  headerLeft: { flexDirection: "row", alignItems: "center", flexShrink: 1 },
-  headerRight: { flexDirection: "row", alignItems: "center" },
-  customHeaderTitle: {
-    fontSize: 19,
-    color: "#1d2121",
-    fontFamily: Platform.select({
-      android: "Geist_700Bold",
-      ios: "Geist_700Bold",
-    }),
-  },
-  headerButton: { marginRight: 10, fontWeight: "bold" },
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 20,
-    marginVertical: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: "#f0f0f0",
-  },
-  searchInput: { flex: 1, fontSize: 16 },
-  contentRoot: { flex: 1, paddingHorizontal: 20 },
-  scrollContent: { paddingTop: 10, paddingBottom: 40 },
-  noteCard: {
-    padding: 20,
-    marginTop: 15,
-    borderRadius: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    minHeight: 80,
-    borderWidth: 2,
-    borderColor: "transparent",
-  },
-  selectedNote: { borderColor: "#C0392B", borderWidth: 2 },
-  content: { fontSize: 20, flex: 1, marginRight: 10 },
-  selectionIndicator: {
-    width: 24,
-    height: 24,
-    marginLeft: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});

@@ -11,6 +11,7 @@ import Toast from "react-native-toast-message";
 import { CustomButton } from "../components/ui/button";
 import { useNotes } from "../hooks/use-notes";
 import { useNavigation } from "@react-navigation/native";
+import { Header } from "../components/header";
 
 const COLORS = [
   "#FD99FF",
@@ -68,6 +69,7 @@ export const NewNotePage = () => {
         backgroundColor="transparent"
         barStyle="dark-content"
       />
+      <Header title="New Note" />
 
       <View style={styles.container}>
         <TextInput

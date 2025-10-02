@@ -34,7 +34,7 @@ apiRouter.get("/session", authMiddleware, (req: Request, res: Response) => {
 
 apiRouter.get("/auth/google", googleSignIn);
 apiRouter.get("/auth/google/callback", googleCallback);
-apiRouter.get("/auth", refresh);
+apiRouter.get("/refresh", refresh);
 
 apiRouter.get("/notes", authMiddleware, getAllNotes);
 apiRouter.get("/notes/:id", authMiddleware, readNote);

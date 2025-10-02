@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, Platform, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  SafeAreaView,
+  StatusBar,
+} from "react-native";
 
 interface HeaderProps {
   title: string;
@@ -28,6 +35,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     paddingVertical: 10,
   },
   title: {

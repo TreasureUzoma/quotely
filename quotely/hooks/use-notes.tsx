@@ -34,7 +34,12 @@ export const useNotes = (id?: string, params?: Record<string, any>) => {
       console.log(res);
       return res.data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["all-notes"] }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["all-notes"] }),
+        await queryClient.invalidateQueries({
+          queryKey: ["notes"],
+        });
+    },
   });
 
   const update = useMutation({
@@ -53,6 +58,7 @@ export const useNotes = (id?: string, params?: Record<string, any>) => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["all-notes"] });
       queryClient.invalidateQueries({ queryKey: ["note", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
   });
 
@@ -70,7 +76,12 @@ export const useNotes = (id?: string, params?: Record<string, any>) => {
         }
       }
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["all-notes"] }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["all-notes"] }),
+        await queryClient.invalidateQueries({
+          queryKey: ["notes"],
+        });
+    },
   });
 
   return {
