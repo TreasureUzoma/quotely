@@ -5,10 +5,11 @@ import {
 } from "../lib/auth/token-storage";
 import { apiUrl } from "../constants";
 
-const AUTH_BASE_URL = `${apiUrl}/refresh"`;
+const AUTH_BASE_URL = `${apiUrl}/refresh-access-token"`;
 
 export const refreshAuthToken = async () => {
   const refreshToken = await getRefreshTokenFromStorage();
+  console.log(AUTH_BASE_URL);
   if (!refreshToken) {
     throw new Error("No refresh token available.");
   }
@@ -28,7 +29,7 @@ export const refreshAuthToken = async () => {
 
     return newAccessToken;
   } catch (error) {
-    console.error("Refresh failed. User needs to re-authenticate. ", error);
+    console.error("Refresh failed. User needs to re-authenticate: ", error);
     throw error;
   }
 };

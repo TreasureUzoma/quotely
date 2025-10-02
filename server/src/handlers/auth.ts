@@ -103,7 +103,7 @@ export const googleSignIn = (req: Request, res: Response) => {
   res.redirect(url);
 };
 
-export const refresh = (req: Request, res: Response) => {
+export const refreshAccessToken = (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json(unauthorized);
