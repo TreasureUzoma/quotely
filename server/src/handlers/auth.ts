@@ -43,6 +43,8 @@ export const googleCallback = async (req: Request, res: Response) => {
       .where(eq(user.email, userInfo.email))
       .limit(1);
 
+    console.log(existing);
+
     if (existing.length === 0) {
       // create user
       await db.insert(user).values({
@@ -66,8 +68,8 @@ export const googleCallback = async (req: Request, res: Response) => {
       { expiresIn: "7d" }
     );
 
-    // Redirect back to app with tokens (or set cookie)
-    const redirectUrl = `myapp://auth?accessToken=${accessToken}&refreshToken=${refreshToken}`;
+    // Redirect back to app with tokens
+    const redirectUrl = `quotely://auth?accessToken=${accessToken}&refreshToken=${refreshToken}`;
     res.redirect(redirectUrl);
   } catch (err) {
     console.error(err);
