@@ -15,8 +15,9 @@ export const AuthPage = () => {
   useEffect(() => {
     const listener = Linking.addEventListener("url", (event) => {
       const url = event.url;
+      console.log(url);
 
-      if (url.startsWith("myapp://auth")) {
+      if (url.startsWith("quotely://auth")) {
         const params = Linking.parse(url).queryParams;
         const accessToken = params?.accessToken;
         const refreshToken = params?.refreshToken;
@@ -32,8 +33,27 @@ export const AuthPage = () => {
   }, []);
 
   const handleGoogleLogin = async () => {
-    const url = `${apiUrl}/auth/google`;
-    await WebBrowser.openBrowserAsync(url);
+    const redirectUrl = Linking.createURL("auth");
+    const url = `${apiUrl}/auth/google?redirect_uri=${encodeURIComponent(
+      redirectUrl
+    )}`;
+
+    console.log(url);
+    console.log(redirectUrl);
+
+    const result = await WebBrowser.openAuthSessionAsync(url, redirectUrl);
+    console.log(result);
+
+    if (result.type === "success" && result.url.startsWith("quotely://auth")) {
+      const params = Linking.parse(result.url).queryParams;
+      const accessToken = params?.accessToken;
+      const refreshToken = params?.refreshToken;
+
+      if (accessToken && refreshToken) {
+        setTokens(accessToken as string, refreshToken as string);
+        navigation.replace("Main");
+      }
+    }
   };
 
   return (

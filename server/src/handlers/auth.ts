@@ -20,9 +20,18 @@ const oauth2Client = new google.auth.OAuth2(
 export const googleCallback = async (req: Request, res: Response) => {
   try {
     const code = req.query.code as string;
+    const redirectUri = req.query.redirect_uri as string;
+
     if (!code) return res.status(400).send("No code provided");
 
-    const { tokens } = await oauth2Client.getToken(code);
+    const { tokens } = await oauth2Client.getToken({
+      code,
+      redirect_uri: `${
+        envConfig.PROD_URL
+      }/api/v1/auth/google/callback?redirect_uri=${encodeURIComponent(
+        redirectUri
+      )}`,
+    });
     oauth2Client.setCredentials(tokens);
 
     const oauth2 = google.oauth2({ version: "v2", auth: oauth2Client });
@@ -52,6 +61,7 @@ export const googleCallback = async (req: Request, res: Response) => {
         email: userInfo.email,
         name: userInfo.name || "Unknown",
         authMethod: "google",
+        emailVerified: true,
       });
     }
 
@@ -69,8 +79,9 @@ export const googleCallback = async (req: Request, res: Response) => {
     );
 
     // Redirect back to app with tokens
-    const redirectUrl = `quotely://auth?accessToken=${accessToken}&refreshToken=${refreshToken}`;
-    res.redirect(redirectUrl);
+    const finalRedirect = `${redirectUri}?accessToken=${accessToken}&refreshToken=${refreshToken}`;
+    console.log(finalRedirect);
+    res.redirect(finalRedirect);
   } catch (err) {
     console.error(err);
     res.status(500).json({
