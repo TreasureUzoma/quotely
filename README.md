@@ -4,33 +4,33 @@ Quotely is a mobile note-taking application designed for ease of use and a beaut
 
 ## Features
 
-*   **Google Authentication:** Securely sign in and manage your account using your Google ID.
-*   **Create & Manage Notes:** Easily create new notes with custom content and choose from a variety of background colors to personalize them.
-*   **View & Search Notes:** Browse through all your notes, with infinite scrolling, and quickly find specific notes using the search functionality.
-*   **Bulk Actions:** Select multiple notes to delete them efficiently.
-*   **Intuitive User Interface:** A clean and modern design ensures a pleasant note-taking experience.
-*   **Onboarding Experience:** Guides new users through the application's core features.
+- **Google Authentication:** Securely sign in and manage your account using your Google ID.
+- **Create & Manage Notes:** Easily create new notes with custom content and choose from a variety of background colors to personalize them.
+- **View & Search Notes:** Browse through all your notes, with infinite scrolling, and quickly find specific notes using the search functionality.
+- **Bulk Actions:** Select multiple notes to delete them efficiently.
+- **Intuitive User Interface:** A clean and modern design ensures a pleasant note-taking experience.
+- **Onboarding Experience:** Guides new users through the application's core features.
 
 ## Stacks / Technologies
 
-| Category      | Technology            | Link                                                    |
-| :------------ | :-------------------- | :------------------------------------------------------ |
-| **Frontend**  | React Native          | [https://reactnative.dev/](https://reactnative.dev/)   |
-|               | Expo                  | [https://expo.dev/](https://expo.dev/)                 |
-|               | React Navigation      | [https://reactnavigation.org/](https://reactnavigation.org/) |
-|               | React Query           | [https://tanstack.com/query/latest](https://tanstack.com/query/latest) |
-|               | Axios                 | [https://axios-http.com/](https://axios-http.com/)     |
-|               | `@expo-google-fonts/geist` | [https://github.com/expo/google-fonts/tree/master/packages/geist](https://github.com/expo/google-fonts/tree/master/packages/geist) |
-|               | `react-native-toast-message` | [https://github.com/calintamas/react-native-toast-message](https://github.com/calintamas/react-native-toast-message) |
-|               | `AsyncStorage`        | [https://react-native-async-storage.github.io/async-storage/docs/usage](https://react-native-async-storage.github.io/async-storage/docs/usage) |
-| **Backend**   | Express.js            | [https://expressjs.com/](https://expressjs.com/)       |
-|               | TypeScript            | [https://www.typescriptlang.org/](https://www.typescriptlang.org/) |
-|               | Drizzle ORM           | [https://orm.drizzle.team/](https://orm.drizzle.team/) |
-|               | Neon Database         | [https://neon.tech/](https://neon.tech/)               |
-|               | Google OAuth2         | [https://developers.google.com/identity/protocols/oauth2](https://developers.google.com/identity/protocols/oauth2) |
-|               | JWT (`jsonwebtoken`)  | [https://jwt.io/](https://jwt.io/)                     |
-|               | Zod                   | [https://zod.dev/](https://zod.dev/)                   |
-|               | Dotenv                | [https://www.npmjs.com/package/dotenv](https://www.npmjs.com/package/dotenv) |
+| Category     | Technology                   | Link                                                                                                                                           |
+| :----------- | :--------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Frontend** | React Native                 | [https://reactnative.dev/](https://reactnative.dev/)                                                                                           |
+|              | Expo                         | [https://expo.dev/](https://expo.dev/)                                                                                                         |
+|              | React Navigation             | [https://reactnavigation.org/](https://reactnavigation.org/)                                                                                   |
+|              | React Query                  | [https://tanstack.com/query/latest](https://tanstack.com/query/latest)                                                                         |
+|              | Axios                        | [https://axios-http.com/](https://axios-http.com/)                                                                                             |
+|              | `@expo-google-fonts/geist`   | [https://github.com/expo/google-fonts/tree/master/packages/geist](https://github.com/expo/google-fonts/tree/master/packages/geist)             |
+|              | `react-native-toast-message` | [https://github.com/calintamas/react-native-toast-message](https://github.com/calintamas/react-native-toast-message)                           |
+|              | `AsyncStorage`               | [https://react-native-async-storage.github.io/async-storage/docs/usage](https://react-native-async-storage.github.io/async-storage/docs/usage) |
+| **Backend**  | Express.js                   | [https://expressjs.com/](https://expressjs.com/)                                                                                               |
+|              | TypeScript                   | [https://www.typescriptlang.org/](https://www.typescriptlang.org/)                                                                             |
+|              | Drizzle ORM                  | [https://orm.drizzle.team/](https://orm.drizzle.team/)                                                                                         |
+|              | Neon Database                | [https://neon.tech/](https://neon.tech/)                                                                                                       |
+|              | Google OAuth2                | [https://developers.google.com/identity/protocols/oauth2](https://developers.google.com/identity/protocols/oauth2)                             |
+|              | JWT (`jsonwebtoken`)         | [https://jwt.io/](https://jwt.io/)                                                                                                             |
+|              | Zod                          | [https://zod.dev/](https://zod.dev/)                                                                                                           |
+|              | Dotenv                       | [https://www.npmjs.com/package/dotenv](https://www.npmjs.com/package/dotenv)                                                                   |
 
 ## Installation
 
@@ -40,7 +40,7 @@ To set up Quotely locally, follow these steps:
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository-url>
+    git clone https://github.com/TreasureUzoma/quotely
     cd quotely
     ```
 2.  **Navigate to the `server` directory:**
@@ -62,10 +62,10 @@ To set up Quotely locally, follow these steps:
     DATABASE_URL="YOUR_NEON_DATABASE_URL" # e.g., postgres://user:password@host:port/database
     PROD_URL="YOUR_SERVER_BASE_URL" # e.g., http://localhost:3000 or your deployed URL
     ```
-    *   Generate strong secrets for `JWT_SECRET` and `REFRESH_SECRET`.
-    *   Obtain `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` from the Google Cloud Console for OAuth 2.0.
-    *   Set up a PostgreSQL database (e.g., using Neon.tech for a serverless option) and provide the `DATABASE_URL`.
-    *   `PROD_URL` should be the base URL where your backend server is accessible.
+    - Generate strong secrets for `JWT_SECRET` and `REFRESH_SECRET`.
+    - Obtain `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` from the Google Cloud Console for OAuth 2.0.
+    - Set up a PostgreSQL database (e.g., using Neon.tech for a serverless option) and provide the `DATABASE_URL`.
+    - `PROD_URL` should be the base URL where your backend server is accessible.
 5.  **Run Drizzle Migrations:**
     ```bash
     npx drizzle-kit push:pg
@@ -99,20 +99,20 @@ To set up Quotely locally, follow these steps:
     yarn start
     ```
 5.  **Run on a device/emulator:**
-    *   **Android:** Press `a` in the terminal or scan the QR code with the Expo Go app.
-    *   **iOS:** Press `i` in the terminal or scan the QR code with the Expo Go app.
+    - **Android:** Press `a` in the terminal or scan the QR code with the Expo Go app.
+    - **iOS:** Press `i` in the terminal or scan the QR code with the Expo Go app.
 
 ## Usage
 
 1.  **Onboarding:** Upon first launch, you will be guided through an onboarding process.
 2.  **Sign In:** After onboarding, you will be directed to the authentication screen. Tap "Continue with Google" to sign in or create an account.
 3.  **Notes Home Screen:** Once signed in, you'll see your notes (or a message to create your first note).
-    *   Scroll down to load more notes.
-    *   Use the search bar at the top to filter notes by content.
-    *   Long-press a note to enter selection mode.
+    - Scroll down to load more notes.
+    - Use the search bar at the top to filter notes by content.
+    - Long-press a note to enter selection mode.
 4.  **Create New Note:** Navigate to the "New" tab to create a new note.
-    *   Type your note content (max 160 characters).
-    *   Tap "Create Note" to save. A random background color will be assigned.
+    - Type your note content (max 160 characters).
+    - Tap "Create Note" to save. A random background color will be assigned.
 5.  **Delete Notes:** In the home screen, long-press a note to select it. You can select multiple notes. Once selected, a trash icon will appear in the header; tap it to delete the selected notes.
 
 ## Contributing
