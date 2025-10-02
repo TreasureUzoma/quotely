@@ -4,5 +4,5 @@ export const envConfig = {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || "",
   DATABASE_URL: process.env.DATABASE_URL || "",
-  API_URL: process.env.PROD_URL || "",
+  PROD_URL: process.env.PROD_URL || "",
 };

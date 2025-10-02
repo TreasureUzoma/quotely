@@ -7,10 +7,14 @@ import { db } from "../db";
 import { user } from "../db/schema";
 import { eq } from "drizzle-orm";
 
+if (!envConfig.PROD_URL) {
+  throw new Error("PROD_URL missing");
+}
+
 const oauth2Client = new google.auth.OAuth2(
   envConfig.GOOGLE_CLIENT_ID,
   envConfig.GOOGLE_CLIENT_SECRET,
-  `${envConfig.API_URL}/auth/google/callback`
+  `${envConfig.PROD_URL}/auth/google/callback`
 );
 
 export const googleCallback = async (req: Request, res: Response) => {

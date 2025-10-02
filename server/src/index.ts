@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import "dotenv/config";
 import { authMiddleware, getContext } from "./middleware/session";
-import { googleSignIn, refresh } from "./handlers/auth";
+import { googleCallback, googleSignIn, refresh } from "./handlers/auth";
 import {
   createNote,
   deleteNote,
@@ -33,6 +33,7 @@ apiRouter.get("/session", authMiddleware, (req: Request, res: Response) => {
 });
 
 apiRouter.get("/auth/google", googleSignIn);
+apiRouter.get("/auth/google/callback", googleCallback);
 apiRouter.get("/auth", refresh);
 
 apiRouter.get("/notes", authMiddleware, getAllNotes);
