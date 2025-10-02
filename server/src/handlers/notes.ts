@@ -109,27 +109,22 @@ export const readNote = async (req: Request, res: Response) => {
     });
   }
 
+  const context = getContext(req);
+  const user = context.user;
+
   try {
     const note = await db
       .select()
       .from(notes)
-      .where(eq(notes.uuid, noteId))
+      .where(and(eq(notes.uuid, noteId), eq(notes.createdByUUID, user!.id)))
       .limit(1);
-    const context = getContext(req);
-    const user = context.user;
 
     if (note.length === 0) {
+      // Returns 404 for both 'not found' and 'permission denied' for security
       return res.status(404).json({
         success: false,
-        message: "Note not found",
+        message: "Note not found or permission denied",
         data: null,
-      });
-    }
-    if (note[0].createdByUUID !== user!.id) {
-      return res.status(403).json({
-        data: null,
-        message: "You don't have permission to perform this action",
-        success: false,
       });
     }
 

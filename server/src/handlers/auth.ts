@@ -41,40 +41,43 @@ export const googleCallback = async (req: Request, res: Response) => {
       });
     }
 
-    // Check if user exists
+    let currentUserId: string;
+
     const existing = await db
       .select()
       .from(user)
       .where(eq(user.email, userInfo.email))
       .limit(1);
 
-    console.log(existing);
-
     if (existing.length === 0) {
-      // create user
-      await db.insert(user).values({
-        googleId: userInfo.id,
-        email: userInfo.email,
-        name: userInfo.name || "Unknown",
-        authMethod: "google",
-        emailVerified: true,
-      });
+      const [newUser] = await db
+        .insert(user)
+        .values({
+          googleId: userInfo.id,
+          email: userInfo.email,
+          name: userInfo.name || "Unknown",
+          authMethod: "google",
+          emailVerified: true,
+        })
+        .returning({ id: user.id });
+
+      currentUserId = newUser.id;
+    } else {
+      currentUserId = existing[0].id;
     }
 
-    // Generate your app JWTs
     const accessToken = jwt.sign(
-      { id: userInfo.id, email: userInfo.email },
+      { id: currentUserId, email: userInfo.email },
       envConfig.JWT_SECRET,
       { expiresIn: "15m" }
     );
 
     const refreshToken = jwt.sign(
-      { id: userInfo.id, email: userInfo.email },
+      { id: currentUserId, email: userInfo.email },
       envConfig.REFRESH_SECRET,
       { expiresIn: "7d" }
     );
 
-    // Redirect back to app with tokens
     const finalRedirect = `${clientRedirect}?accessToken=${accessToken}&refreshToken=${refreshToken}`;
     res.redirect(finalRedirect);
   } catch (err) {

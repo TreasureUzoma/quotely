@@ -10,12 +10,13 @@ import {
   SafeAreaView,
   StatusBar,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 
-import { dummyNotes } from "../data/notes";
 import { NoNotes } from "../components/no-notes";
+import { useNotes } from "../hooks/use-notes"; // <-- our unified hook
 
 interface HeaderProps {
   title: string;
@@ -83,7 +84,7 @@ const Header = ({
 };
 
 export const HomePage = () => {
-  const [notes, setNotes] = useState<Note[]>(dummyNotes);
+  const { allNotes, remove } = useNotes(); // <-- fetch + delete
   const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -105,9 +106,7 @@ export const HomePage = () => {
 
   const handleDelete = () => {
     if (selectedNoteIds.length === 0) return;
-    setNotes((prev) =>
-      prev.filter((note) => !selectedNoteIds.includes(note.id!))
-    );
+    selectedNoteIds.forEach((id) => remove.mutate(id));
 
     Toast.show({
       type: "success",
@@ -121,14 +120,13 @@ export const HomePage = () => {
 
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
-    console.log("Searching for:", text);
   };
 
   const filteredNotes = searchQuery
-    ? notes.filter((note) =>
+    ? allNotes.data?.filter((note: any) =>
         note.content.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : notes;
+    : allNotes.data;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -158,14 +156,20 @@ export const HomePage = () => {
 
       <View style={styles.contentRoot}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {filteredNotes.length === 0 ? (
+          {allNotes.isLoading ? (
+            <>
+              <SkeletonNote />
+              <SkeletonNote />
+              <SkeletonNote />
+            </>
+          ) : !filteredNotes || filteredNotes.length === 0 ? (
             <NoNotes />
           ) : (
-            filteredNotes.map((note, idx) => {
+            filteredNotes.map((note: any) => {
               const isSelected = selectedNoteIds.includes(note.id!);
               return (
                 <TouchableOpacity
-                  key={note.id ?? idx}
+                  key={note.id}
                   onLongPress={() => handleLongPress(note.id!)}
                   onPress={() =>
                     isSelectionMode
@@ -195,6 +199,14 @@ export const HomePage = () => {
     </SafeAreaView>
   );
 };
+
+const SkeletonNote = () => (
+  <View style={[styles.noteCard, { backgroundColor: "#eee" }]}>
+    <View
+      style={{ flex: 1, height: 20, backgroundColor: "#ddd", borderRadius: 4 }}
+    />
+  </View>
+);
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#fff" },

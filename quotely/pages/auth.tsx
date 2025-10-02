@@ -8,9 +8,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { authStyles as styles } from "../styles/auth";
 import { apiUrl } from "../constants";
 import { setTokens } from "../lib/auth/token-storage";
+import Toast from "react-native-toast-message";
+import { useGoogleAuth } from "../hooks/use-auth";
 
 export const AuthPage = () => {
   const navigation = useNavigation<any>();
+  const { mutate } = useGoogleAuth();
 
   useEffect(() => {
     const listener = Linking.addEventListener("url", (event) => {
@@ -44,14 +47,26 @@ export const AuthPage = () => {
     const result = await WebBrowser.openAuthSessionAsync(url, redirectUrl);
     console.log(result);
 
-    if (result.type === "success" && result.url.startsWith("quotely://auth")) {
+    if (result.type === "success" && result.url.startsWith(redirectUrl)) {
       const params = Linking.parse(result.url).queryParams;
-      const accessToken = params?.accessToken;
-      const refreshToken = params?.refreshToken;
+      const accessToken = params?.accessToken as string | undefined;
+      const refreshToken = params?.refreshToken as string | undefined;
 
       if (accessToken && refreshToken) {
-        setTokens(accessToken as string, refreshToken as string);
-        navigation.replace("Main");
+        mutate(
+          { accessToken, refreshToken },
+          {
+            onSuccess: () => {
+              Toast.show({
+                type: "success",
+                text1: "Signed in successfully",
+                position: "bottom",
+                visibilityTime: 4000,
+              });
+              navigation.replace("Main");
+            },
+          }
+        );
       }
     }
   };

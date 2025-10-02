@@ -1,4 +1,3 @@
-// pages/new-note.tsx
 import React, { useState } from "react";
 import {
   View,
@@ -10,13 +9,8 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { CustomButton } from "../components/ui/button";
-
-type Note = {
-  id: string;
-  content: string;
-  date: string;
-  bgColor: string;
-};
+import { useNotes } from "../hooks/use-notes";
+import { useNavigation } from "@react-navigation/native";
 
 const COLORS = [
   "#FD99FF",
@@ -29,6 +23,8 @@ const COLORS = [
 
 export const NewNotePage = () => {
   const [content, setContent] = useState("");
+  const { create } = useNotes();
+  const navigation = useNavigation<any>();
 
   const handleCreateNote = () => {
     if (!content.trim()) {
@@ -40,20 +36,29 @@ export const NewNotePage = () => {
       return;
     }
 
-    const newNote = {
+    const payload = {
       content,
-      date: new Date().toISOString(),
       bgColor: COLORS[Math.floor(Math.random() * COLORS.length)],
     };
 
-    console.log("New Note Created:", newNote);
-
-    Toast.show({
-      type: "success",
-      text1: "Note created successfully!",
-      position: "bottom",
+    create.mutate(payload, {
+      onSuccess: () => {
+        Toast.show({
+          type: "success",
+          text1: "Note created successfully!",
+          position: "bottom",
+        });
+        setContent("");
+        navigation.goBack();
+      },
+      onError: () => {
+        Toast.show({
+          type: "error",
+          text1: "Failed to create note",
+          position: "bottom",
+        });
+      },
     });
-    setContent("");
   };
 
   return (
@@ -76,9 +81,10 @@ export const NewNotePage = () => {
         />
 
         <CustomButton
-          title="Create Note"
+          title={create.isPending ? "Creating..." : "Create Note"}
           onPress={handleCreateNote}
           style={styles.button}
+          disabled={create.isPending}
         />
       </View>
 
@@ -113,7 +119,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: "center",
-    width: "100%", // button fills width
+    width: "100%",
   },
   buttonText: {
     color: "#fff",
