@@ -31,6 +31,7 @@ export const userSubscriptionEnum = pgEnum("user_subscription", [
 
 export const user = pgTable("user", {
   id: uuid("id").defaultRandom().primaryKey(),
+  googleId: text("google_id").unique(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   password: text("password"),

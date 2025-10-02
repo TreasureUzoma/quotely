@@ -46,7 +46,7 @@ export const googleCallback = async (req: Request, res: Response) => {
     if (existing.length === 0) {
       // create user
       await db.insert(user).values({
-        id: userInfo.id,
+        googleId: userInfo.id,
         email: userInfo.email,
         name: userInfo.name || "Unknown",
         authMethod: "google",

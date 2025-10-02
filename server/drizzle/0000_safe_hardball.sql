@@ -15,6 +15,7 @@ CREATE TABLE "notes" (
 --> statement-breakpoint
 CREATE TABLE "user" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"google_id" text,
 	"name" text NOT NULL,
 	"email" text NOT NULL,
 	"password" text,
@@ -26,6 +27,7 @@ CREATE TABLE "user" (
 	"status" "user_status" DEFAULT 'active',
 	"role" "user_role" DEFAULT 'user',
 	"subscription_type" "user_subscription" DEFAULT 'free',
+	CONSTRAINT "user_google_id_unique" UNIQUE("google_id"),
 	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
