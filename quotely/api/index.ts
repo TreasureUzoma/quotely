@@ -20,6 +20,8 @@ export const refreshAuthToken = async () => {
       },
     });
 
+    console.log(response);
+
     const newAccessToken = response.data.data.accessToken;
 
     await setTokens(newAccessToken, refreshToken);

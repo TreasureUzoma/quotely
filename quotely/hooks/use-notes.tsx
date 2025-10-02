@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import apiClient from "../api/client";
 
 export const useNotes = (id?: string, params?: Record<string, any>) => {
@@ -8,8 +13,6 @@ export const useNotes = (id?: string, params?: Record<string, any>) => {
     queryKey: ["all-notes", params],
     queryFn: async () => {
       const { data: res } = await apiClient.get("/notes", { params });
-      console.log(res);
-
       return res.data;
     },
   });
@@ -55,10 +58,17 @@ export const useNotes = (id?: string, params?: Record<string, any>) => {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { data: res } = await apiClient.delete(`/notes/${id}`);
-      console.log(res);
-
-      return res.data;
+      try {
+        console.log("starting delete", id);
+        const { data: res } = await apiClient.delete(`/notes/${id}`);
+        console.log("delete response:", res);
+        return res;
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error("delete error:", err.message);
+          throw err;
+        }
+      }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["all-notes"] }),
   });
@@ -70,4 +80,32 @@ export const useNotes = (id?: string, params?: Record<string, any>) => {
     update,
     remove,
   };
+};
+
+type NotesResponse = {
+  success: boolean;
+  message: string;
+  data: Note[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+};
+
+export const useInfiniteNotes = () => {
+  return useInfiniteQuery<NotesResponse>({
+    queryKey: ["notes"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const { data: res } = await apiClient.get(`/notes?page=${pageParam}`);
+      console.log(res);
+      return res;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+  });
 };

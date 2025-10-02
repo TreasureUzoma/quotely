@@ -5,10 +5,14 @@ import { Alert, TouchableOpacity } from "react-native";
 
 import { HomePage } from "../pages/home";
 import { NewNotePage } from "../pages/new-note";
+import { setTokens } from "../lib/auth/token-storage";
+import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 const Tab = createBottomTabNavigator();
 
 export const MainTabs = () => {
+  const navigation = useNavigation<any>();
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
@@ -16,7 +20,16 @@ export const MainTabs = () => {
         text: "Yes, Logout",
         style: "destructive",
 
-        onPress: () => console.log("Perform logout here"),
+        onPress: async () => {
+          await setTokens(null, null);
+          Toast.show({
+            type: "success",
+            text1: "Signed out successfully",
+            position: "bottom",
+            visibilityTime: 4000,
+          });
+          navigation.replace("Auth");
+        },
       },
     ]);
   };

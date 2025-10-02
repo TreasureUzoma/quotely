@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getAccessTokenFromStorage } from "../lib/auth/token-storage";
-import { refreshAuthToken } from ".";
 import { apiUrl } from "../constants";
+import { refreshAuthToken } from ".";
 const apiClient = axios.create({
   baseURL: apiUrl,
   headers: {

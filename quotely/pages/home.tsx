@@ -1,4 +1,3 @@
-// pages/home.tsx
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -16,7 +15,9 @@ import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 
 import { NoNotes } from "../components/no-notes";
-import { useNotes } from "../hooks/use-notes"; // <-- our unified hook
+import { useNotes } from "../hooks/use-notes";
+import { useInfiniteNotes } from "../hooks/use-notes";
+import { FlatList } from "react-native";
 
 interface HeaderProps {
   title: string;
@@ -84,7 +85,9 @@ const Header = ({
 };
 
 export const HomePage = () => {
-  const { allNotes, remove } = useNotes(); // <-- fetch + delete
+  const { remove } = useNotes();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useInfiniteNotes();
   const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -104,29 +107,42 @@ export const HomePage = () => {
 
   const handleCancel = () => setSelectedNoteIds([]);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedNoteIds.length === 0) return;
-    selectedNoteIds.forEach((id) => remove.mutate(id));
 
-    Toast.show({
-      type: "success",
-      text1: `${selectedNoteIds.length} Note(s) Deleted`,
-      position: "bottom",
-      visibilityTime: 4000,
-    });
+    try {
+      await Promise.all(selectedNoteIds.map((id) => remove.mutateAsync(id)));
 
-    setSelectedNoteIds([]);
+      Toast.show({
+        type: "success",
+        text1: `${selectedNoteIds.length} Note(s) Deleted`,
+        position: "bottom",
+        visibilityTime: 4000,
+      });
+
+      setSelectedNoteIds([]);
+    } catch (err) {
+      Toast.show({
+        type: "error",
+        text1: "Failed to delete some notes",
+        position: "bottom",
+        visibilityTime: 4000,
+      });
+      console.error(err);
+    }
   };
 
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
   };
 
+  const allNotes = data?.pages.flatMap((page) => page.data) ?? [];
+
   const filteredNotes = searchQuery
-    ? allNotes.data?.filter((note: any) =>
+    ? allNotes.filter((note) =>
         note.content.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : allNotes.data;
+    : allNotes;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -138,7 +154,6 @@ export const HomePage = () => {
         onPressDelete={handleDelete}
       />
 
-      {/* Always visible search bar */}
       <View style={styles.searchContainer}>
         <Ionicons
           name="search"
@@ -155,45 +170,30 @@ export const HomePage = () => {
       </View>
 
       <View style={styles.contentRoot}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          {allNotes.isLoading ? (
-            <>
-              <SkeletonNote />
-              <SkeletonNote />
-              <SkeletonNote />
-            </>
-          ) : !filteredNotes || filteredNotes.length === 0 ? (
-            <NoNotes />
-          ) : (
-            filteredNotes.map((note: any) => {
-              const isSelected = selectedNoteIds.includes(note.id!);
-              return (
-                <TouchableOpacity
-                  key={note.id}
-                  onLongPress={() => handleLongPress(note.id!)}
-                  onPress={() =>
-                    isSelectionMode
-                      ? handleSelectNote(note.id!)
-                      : console.log("Navigate to note detail")
-                  }
-                  activeOpacity={0.8}
-                  style={[
-                    styles.noteCard,
-                    { backgroundColor: note.bgColor },
-                    isSelected && styles.selectedNote,
-                  ]}
-                >
-                  <Text style={styles.content}>{note.content}</Text>
-                  {isSelected && (
-                    <View style={styles.selectionIndicator}>
-                      <Ionicons name="checkbox" size={24} color="#007AFF" />
-                    </View>
-                  )}
-                </TouchableOpacity>
-              );
-            })
+        <FlatList
+          data={filteredNotes}
+          keyExtractor={(item) => item.id!}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onLongPress={() => handleLongPress(item.id!)}
+              onPress={() =>
+                isSelectionMode
+                  ? handleSelectNote(item.id!)
+                  : console.log("Navigate")
+              }
+              style={[styles.noteCard, { backgroundColor: item.bgColor }]}
+            >
+              <Text style={styles.content}>{item.content}</Text>
+            </TouchableOpacity>
           )}
-        </ScrollView>
+          onEndReached={() => {
+            if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={() =>
+            isFetchingNextPage ? <ActivityIndicator /> : null
+          }
+        />
       </View>
       <Toast />
     </SafeAreaView>

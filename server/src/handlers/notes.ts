@@ -232,7 +232,12 @@ export const getAllNotes = async (req: Request, res: Response) => {
       .where(and(...conditions));
 
     const data = await db
-      .select()
+      .select({
+        id: notes.uuid,
+        content: notes.content,
+        bgColor: notes.bgColor,
+        createdAt: notes.createdAt,
+      })
       .from(notes)
       .where(and(...conditions))
       .orderBy(sort === "oldest" ? asc(notes.createdAt) : desc(notes.createdAt))
