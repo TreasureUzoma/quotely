@@ -6,6 +6,8 @@ import {
   SafeAreaView,
   StatusBar,
   Platform,
+  KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { CustomButton } from "../components/ui/button";
@@ -71,24 +73,30 @@ export const NewNotePage = () => {
       />
       <Header title="New Note" />
 
-      <View style={styles.container}>
-        <TextInput
-          placeholder="Type your note (max 150 chars)"
-          value={content}
-          onChangeText={(text) => {
-            if (text.length <= 160) setContent(text);
-          }}
-          multiline
-          style={styles.textArea}
-        />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+        >
+          <TextInput
+            placeholder="Type your note (max 150 chars)"
+            value={content}
+            onChangeText={(text) => text.length <= 160 && setContent(text)}
+            multiline
+            style={styles.textArea}
+          />
 
-        <CustomButton
-          title={create.isPending ? "Creating..." : "Create Note"}
-          onPress={handleCreateNote}
-          style={styles.button}
-          disabled={create.isPending}
-        />
-      </View>
+          <CustomButton
+            title={create.isPending ? "Creating..." : "Create Note"}
+            onPress={handleCreateNote}
+            style={styles.button}
+            disabled={create.isPending}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <Toast />
     </SafeAreaView>
